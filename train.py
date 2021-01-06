@@ -5,11 +5,11 @@ import torch
 import argparse
 import numpy as np
 from multiprocessing import cpu_count
-from tensorboardX import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 from torch.utils.data import DataLoader
 from collections import OrderedDict, defaultdict
 
-from ptb import PTB
+from gigaword import Gigaword
 from utils import to_var, idx2word, experiment_name
 from model import SentenceVAE
 
@@ -20,7 +20,7 @@ def main(args):
 
     datasets = OrderedDict()
     for split in splits:
-        datasets[split] = PTB(
+        datasets[split] = Gigaword(
             data_dir=args.data_dir,
             split=split,
             create_data=args.create_data,

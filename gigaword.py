@@ -5,22 +5,23 @@ import torch
 import numpy as np
 from collections import defaultdict
 from torch.utils.data import Dataset
-from nltk.tokenize import TweetTokenizer
+#from nltk.tokenize import TweetTokenizer
+from nltk.tokenize.punkt import PunktSentenceTokenizer
 from utils import OrderedCounter
 
-class PTB(Dataset):
+class Gigaword(Dataset):
     def __init__(self, data_dir, split, create_data, **kwargs):
         super().__init__()
         self.data_dir = data_dir
         self.split = split
         self.max_sequence_length = kwargs.get('max_sequence_length', 50)
         self.min_occ = kwargs.get('min_occ', 3)
-        self.raw_data_path = os.path.join(data_dir, 'ptb.'+split+'.txt')
-        self.data_file = 'ptb.'+split+'.json'
-        self.vocab_file = 'ptb.vocab.json'
+        self.raw_data_path = os.path.join(data_dir, 'giga.'+split+'.txt')
+        self.data_file = 'giga.'+split+'.json'
+        self.vocab_file = 'giga.vocab.json'
 
         if create_data:
-            print("Creating new %s ptb data."%split.upper())
+            print("Creating new %s gigaword data."%split.upper())
             self._create_data()
         elif not os.path.exists(os.path.join(self.data_dir, self.data_file)):
             print("%s preprocessed file not found at %s. Creating new."%(split.upper(), os.path.join(self.data_dir, self.data_file)))
@@ -86,7 +87,7 @@ class PTB(Dataset):
             self._create_vocab()
         else:
             self._load_vocab()
-        tokenizer = TweetTokenizer(preserve_case=False)
+        tokenizer = PunktSentenceTokenizer(preserve_case=False)
         data = defaultdict(dict)
         with open(self.raw_data_path, 'r') as file:
             for i, line in enumerate(file):
@@ -114,8 +115,8 @@ class PTB(Dataset):
         self._load_data(vocab=False)
 
     def _create_vocab(self):
-        assert self.split == 'train', "Vocablurary can only be created for training file."
-        tokenizer = TweetTokenizer(preserve_case=False)
+        assert self.split == 'train', "Vocabulary can only be created for training file."
+        tokenizer = PunktSentenceTokenizer(preserve_case=False)
         w2c = OrderedCounter()
         w2i = dict()
         i2w = dict()
@@ -133,7 +134,7 @@ class PTB(Dataset):
                     w2i[w] = len(w2i)
         assert len(w2i) == len(i2w)
 
-        print("Vocablurary of %i keys created." %len(w2i))
+        print("Vocabulary of %i keys created." %len(w2i))
 
         vocab = dict(w2i=w2i, i2w=i2w)
         with io.open(os.path.join(self.data_dir, self.vocab_file), 'wb') as vocab_file:
