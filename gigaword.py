@@ -113,6 +113,7 @@ class Gigaword(Dataset):
             data = json.dumps(data, ensure_ascii=False)
             data_file.write(data.encode('utf8', 'replace'))
         self._load_data(vocab=False)
+        
 
     def _create_vocab(self):
         assert self.split == 'train', "Vocabulary can only be created for training file."
